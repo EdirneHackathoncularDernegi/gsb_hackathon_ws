@@ -3,3 +3,4 @@ langchain_community
 langchain_groq
 transformers
 bs4
+transformers
