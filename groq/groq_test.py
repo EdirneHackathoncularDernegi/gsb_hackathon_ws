@@ -19,9 +19,8 @@ icon("🏎️")
 
 st.subheader("Groq Chat Streamlit App", divider="rainbow", anchor=False)
 
-client = Groq(
-    api_key=st.secrets["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"],
-)
+client = Groq("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")
+
 
 # Initialize chat history and selected model
 if "messages" not in st.session_state:
