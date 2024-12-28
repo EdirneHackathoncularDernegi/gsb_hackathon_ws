@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import time
+import pickle
 from dotenv import load_dotenv
 
 # LangChain ve Groq modülleri
@@ -19,7 +20,7 @@ from langchain.document_loaders import PyPDFLoader
 # Streamlit sayfa ayarları
 st.set_page_config(
     page_title="SoruCan Demo",
-    page_icon=":student:",
+    page_icon=":male-student:",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -56,10 +57,13 @@ websites = [
 
 # PDF dosyalarını koddan belirliyoruz (örnek yollar):
 pdf_file_paths = [
-r"source\2023 Faaliyet Raporu.pdf",
-r"source\2023 Faaliyet Raporu.pdf",
-
+    r"source\2023 Faaliyet Raporu.pdf",
+    r"source\2023 Faaliyet Raporu.pdf",
 ]
+
+# Vektörleri kaydetmek için klasör
+vector_output_folder = r"source\vector_outputs"
+os.makedirs(vector_output_folder, exist_ok=True)
 
 st.title("SoruCan")
 
@@ -75,6 +79,16 @@ with st.sidebar:
     st.write("*Matiricie*")
 
 # --- ANA GÖVDE ---
+
+def save_vectors_to_file(vectors, output_file):
+    """Vektörleri bir dosyaya kaydeder."""
+    with open(output_file, 'wb') as f:
+        pickle.dump(vectors, f)
+
+def load_vectors_from_file(file_path):
+    """Bir dosyadan vektörleri yükler."""
+    with open(file_path, 'rb') as f:
+        return pickle.load(f)
 
 # Yalnızca bir kez embeddings ve vectorstore oluşturmak
 if "vectors" not in st.session_state:
@@ -129,8 +143,13 @@ if "vectors" not in st.session_state:
                 continue
 
             pdf_vectors = FAISS.from_documents(pdf_final_docs, embeddings)
+
+            # Vektörleri kaydet
+            vector_file = os.path.join(vector_output_folder, os.path.basename(pdf_path).replace('.pdf', '_vectors.pkl'))
+            save_vectors_to_file(pdf_vectors, vector_file)
+
             all_vectors.append(pdf_vectors)
-            st.success(f"**{pdf_path}** için vektörleşme tamamlandı! Doküman sayısı: {len(pdf_final_docs)}")
+            st.success(f"**{pdf_path}** için vektörleşme tamamlandı ve kaydedildi! Doküman sayısı: {len(pdf_final_docs)}")
 
         except Exception as e:
             st.error(f"{pdf_path} yüklenirken hata oluştu: {e}")
