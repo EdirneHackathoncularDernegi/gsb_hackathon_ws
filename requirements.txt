@@ -7,3 +7,5 @@ transformers
 langchain-ollama
 groq
 python-dotenv
+pypdf
+tqdm

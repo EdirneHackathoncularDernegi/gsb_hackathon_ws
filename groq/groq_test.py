@@ -1,5 +1,9 @@
 import streamlit as st
 import os
+import time
+from dotenv import load_dotenv
+
+# LangChain ve Groq modülleri
 from langchain_groq import ChatGroq
 from langchain_community.document_loaders import WebBaseLoader
 from langchain.embeddings import OllamaEmbeddings
@@ -8,83 +12,151 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from langchain_community.vectorstores import FAISS
-import time
-from dotenv import load_dotenv
 
+# EKLENDİ: PDF Desteği (artık doğrudan kod içinde path belirtilecek)
+from langchain.document_loaders import PyPDFLoader
+
+# Streamlit sayfa ayarları
+st.set_page_config(
+    page_title="SoruCan Demo",
+    page_icon=":student:",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Örnek CSS
+st.markdown(
+    """
+    <style>
+    [data-testid="stSidebar"] {
+        background-color: #e7e9ec; /* Sidebar'ın arka planı */
+        color: #333 !important;    /* Metin rengi */
+    }
+    .stTextInput > label {
+        font-weight: 600;
+    }
+    .stTitle, .stHeader, .stCaption {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+# .env dosyasından yükleyelim
 load_dotenv()
-## load the Groq API key
 groq_api_key = os.environ.get('GROQ_API_KEY', None)
 
 # Web siteleri listesi
 websites = [
-    "https://genclikhizmetleri.gov.tr/",
-    "https://biz.gsb.gov.tr/",
-    "https://genclikhizmetleri.gov.tr/hizmetlerimiz/"
+    "https://gsb.gov.tr/haberler-ve-duyurular.html",
+    "https://genclikhizmetleri.gov.tr/hizmetlerimiz/",
+    #"https://biz.gsb.gov.tr/page/egitim/BilisimEgitimleri/"
 ]
 
-# Streamlit Uygulaması
-st.title("soruCan Demo")
+# PDF dosyalarını koddan belirliyoruz (örnek yollar):
+pdf_file_paths = [
+r"source\2023 Faaliyet Raporu.pdf",
+r"source\2023 Faaliyet Raporu.pdf",
 
-# Sadece bir kez embeddings ve vectorstore oluşturmak için
+]
+
+st.title("SoruCan")
+
+# --- SIDEBAR ---
+with st.sidebar:
+    st.header("Hakkında")
+    st.write("""
+    **SoruCan**, Gençlik ve Spor Bakanlığı ile ilgili web sitelerinden ve 
+    önceden belirlenmiş PDF'lerden toplanan bilgilere dayanarak sorularınızı 
+    yanıtlamak için tasarlanmış bir chatbot prototipidir.
+    """)
+    st.markdown("---")
+    st.write("*Matiricie*")
+
+# --- ANA GÖVDE ---
+
+# Yalnızca bir kez embeddings ve vectorstore oluşturmak
 if "vectors" not in st.session_state:
-    st.write("Vektör depoları oluşturuluyor, lütfen bekleyin...")
+    st.info("Vektör depoları oluşturuluyor, lütfen bekleyin...")
     all_vectors = []
     embeddings = OllamaEmbeddings()
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 
-    # Metinleri bölerken kullanılacak parametreler
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200
-    )
+    # 1) Önce web sitelerinden veri çekelim
+    total_sites = len(websites)
+    progress_bar = st.progress(0)
 
-    # Her site için dokümanları indirip parçalara ayırma
-    for url in websites:
+    for idx, url in enumerate(websites):
         try:
-            loader = WebBaseLoader(url)
-            documents = loader.load()
+            with st.spinner(f"'{url}' adresinden veri toplanıyor..."):
+                loader = WebBaseLoader(url)
+                documents = loader.load()
 
-            # Dokümanların boş gelip gelmediğini kontrol edelim
             if not documents:
-                st.warning(f"{url} adresinden veri alınamadı veya boş döndü.")
+                st.warning(f"**{url}** adresinden veri alınamadı veya boş döndü.")
                 continue
 
-            final_documents = text_splitter.split_documents(documents)
-
-            # final_documents boş mu kontrol edelim
-            if not final_documents:
-                st.warning(f"{url} dokümanlarını bölerken içerik oluşturulamadı.")
+            final_docs = text_splitter.split_documents(documents)
+            if not final_docs:
+                st.warning(f"**{url}** dokümanlarını bölerken içerik oluşturulamadı.")
                 continue
 
-            # Vektör oluştur
-            vectors = FAISS.from_documents(final_documents, embeddings)
+            vectors = FAISS.from_documents(final_docs, embeddings)
             all_vectors.append(vectors)
-            st.write(f"**{url}** için vektörleşme tamamlandı! Doküman sayısı: {len(final_documents)}")
+            st.success(f"**{url}** için vektörleşme tamamlandı! Doküman sayısı: {len(final_docs)}")
 
         except Exception as e:
             st.error(f"{url} verisi alınırken hata oluştu: {e}")
 
-    # Tüm web sitelerini tek bir FAISS objesinde birleştirelim
+        # Progress bar güncelle
+        progress_bar.progress(int((idx + 1) / total_sites * 100))
+
+    # 2) Şimdi PDF dosyalarını yükleyip vektörleştirelim
+    for pdf_path in pdf_file_paths:
+        try:
+            with st.spinner(f"'{pdf_path}' PDF dosyası yükleniyor..."):
+                pdf_loader = PyPDFLoader(pdf_path)
+                pdf_docs = pdf_loader.load()
+
+            if not pdf_docs:
+                st.warning(f"**{pdf_path}** içi boş ya da okunamadı.")
+                continue
+
+            pdf_final_docs = text_splitter.split_documents(pdf_docs)
+            if not pdf_final_docs:
+                st.warning(f"**{pdf_path}** belgelerini bölerken içerik oluşturulamadı.")
+                continue
+
+            pdf_vectors = FAISS.from_documents(pdf_final_docs, embeddings)
+            all_vectors.append(pdf_vectors)
+            st.success(f"**{pdf_path}** için vektörleşme tamamlandı! Doküman sayısı: {len(pdf_final_docs)}")
+
+        except Exception as e:
+            st.error(f"{pdf_path} yüklenirken hata oluştu: {e}")
+
+    # Tüm data (web + pdf) tek bir FAISS objesinde birleştirelim
     if all_vectors:
-        # İlk vectorstore'u referans alarak diğerlerini merge edebiliriz
         base_vectorstore = all_vectors[0]
         for vectorstore in all_vectors[1:]:
             base_vectorstore.merge_from(vectorstore)
         st.session_state.vectors = base_vectorstore
 
-        st.success("Tüm web sitelerinden veri vektörleştirme tamamlandı!")
+        st.balloons()
+        st.success("Tüm kaynaklardan veri vektörleştirme tamamlandı!")
     else:
-        st.error("Hiçbir web sitesi için vektör oluşturulamadı. Uygulama çalışmayabilir.")
+        st.error("Hiçbir veri kaynağından vektör oluşturulamadı. Uygulama çalışmayabilir.")
 else:
-    st.write("Önceden oluşturulmuş vektör depoları kullanılıyor...")
+    st.info("Önceden oluşturulmuş vektör depoları kullanılıyor...")
 
-# Eğer GROQ_API_KEY bulunamazsa uyarı
+# GROQ_API_KEY yoksa uyarı
 if not groq_api_key:
-    st.error("GROQ_API_KEY bulunamadı! lütfen .env dosyanızı kontrol edin.")
+    st.error("GROQ_API_KEY bulunamadı! Lütfen .env dosyanızı veya çevresel değişkenlerinizi kontrol edin.")
 
 # LLM tanımı
 llm = ChatGroq(
     groq_api_key=groq_api_key,
-    model_name="mixtral-8x7b-32768"
+    model_name="llama-3.3-70b-versatile"
 )
 
 # Prompt metni
@@ -95,7 +167,7 @@ Cevaplarını:
 - Sorunun bağlamına uygun şekilde cevapla.
 - Eğer dokümanda bilgi yoksa "Bu bilgi sağlanan dokümanda mevcut değil." yanıtını ver.
 - Fazladan tahmin yapma ya da doküman dışına çıkma.
-  
+
 Kendi bilgi birikimini kullanma; yalnızca sağlanan dosyaya dayan.
 Cevap verirken lütfen:
 - Gerekirse örnekler veya detaylarla açıklama yap.
@@ -115,23 +187,29 @@ Cevaplar:
 
 chat_prompt = ChatPromptTemplate.from_template(prompt_template)
 
-# Vectorstore'un var olup olmadığını kontrol et
+# Vektör oluşturulmuş mu kontrol
 if "vectors" in st.session_state:
-    # Belgeleri birleştirme chain'i
     document_chain = create_stuff_documents_chain(llm, chat_prompt)
     retriever = st.session_state.vectors.as_retriever()
     retrieval_chain = create_retrieval_chain(retriever, document_chain)
 
-    prompt_input = st.text_input("Sorunuzu Buraya Girin")
-    if prompt_input:
-        start = time.process_time()
-        response = retrieval_chain.invoke({"input": prompt_input})
-        st.write("Cevap:", response['answer'])
-        st.write("Response time:", time.process_time() - start)
+    # Soru giriş alanı
+    st.subheader("Soru Sor")
+    user_question = st.text_input("Örneğin: Gençlik kampları nerede düzenleniyor?")
+
+    if user_question:
+        with st.spinner("Cevap aranıyor..."):
+            start = time.process_time()
+            response = retrieval_chain.invoke({"input": user_question})
+            elapsed = time.process_time() - start
+
+        st.markdown("### Cevap:")
+        st.write(response['answer'])
+        st.caption(f"Yanıt süresi: {elapsed:.2f} saniye")
 
         with st.expander("Doküman Benzerliği (Similarity Search)"):
             for i, doc in enumerate(response["context"]):
-                st.markdown(f"**Doküman {i+1}:**")
+                st.markdown(f"**Doküman Parçası {i+1}:**")
                 st.write(doc.page_content[:500] + "...")
                 st.write("---")
 
