@@ -14,10 +14,8 @@ def process_page(args):
     page, embeddings = args
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     split_documents = text_splitter.split_documents([page])  # Sayfa içeriğini böl
-    if not split_documents:
-        raise ValueError(f"Split işlemi boş sonuç döndürdü. Sayfa içeriği: {page.page_content[:100]}...")
-    return FAISS.from_documents(split_documents, embeddings)
 
+    return FAISS.from_documents(split_documents, embeddings)
 def process_pdf_to_vectors_with_progress(pdf_path, output_path):
     """
     PDF dosyasını işler ve FAISS vektörlerini oluşturur.
@@ -61,7 +59,6 @@ def process_pdf_to_vectors_with_progress(pdf_path, output_path):
 
     except Exception as e:
         print(f"Error processing {pdf_path}: {e}")
-
 
 
 if __name__ == "__main__":
