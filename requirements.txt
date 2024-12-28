@@ -5,3 +5,4 @@ transformers
 bs4
 transformers
 langchain-ollama
+groq
