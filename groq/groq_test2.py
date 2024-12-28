@@ -12,7 +12,7 @@ import time
 from dotenv import load_dotenv
 load_dotenv()
 ## load the Groq API key
-groq_api_key='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'
+groq_api_key=os.environ['GROQ_API_KEY']
 
 
 if "vector" not in st.session_state:
