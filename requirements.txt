@@ -9,3 +9,5 @@ groq
 python-dotenv
 pypdf
 tqdm
+streamlit-option-menu      
+PyMuPDF  
