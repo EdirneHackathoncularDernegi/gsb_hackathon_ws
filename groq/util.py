@@ -23,7 +23,7 @@ def sidebar_api_key_configuration() -> str:
         st.sidebar.warning('Enter the API Key(s) 🗝️')
         st.session_state.prompt_activation = False
     elif groq_api_key.startswith('gsk_') and len(groq_api_key) == 56:
-        st.sidebar.success('Lets Proceed!', icon='️👉')
+        st.sidebar.success(' ', icon='️👉')
         st.session_state.prompt_activation = True
     else:
         st.sidebar.warning('Please enter the correct API Key 🗝️!', icon='⚠️')

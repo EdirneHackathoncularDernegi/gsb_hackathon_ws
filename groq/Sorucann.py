@@ -47,7 +47,7 @@ def sidebar_api_key_configuration() -> str:
         st.sidebar.warning('Enter the API Key(s) 🗝️')
         st.session_state.prompt_activation = False
     elif groq_api_key.startswith('gsk_') and len(groq_api_key) == 56:
-        st.sidebar.success('Lets Proceed!', icon='👉')
+        st.sidebar.success(' ', icon='👉')
         st.session_state.prompt_activation = True
     else:
         st.sidebar.warning('Please enter the correct API Key 🗝️!', icon='⚠️')
@@ -260,20 +260,8 @@ llm = ChatGroq(groq_api_key=groq_api_key, model_name=model)
 # Prompt Şablonu
 prompt = ChatPromptTemplate.from_template(
     """
-    Sen, bir Gençlik Bilgilendirme Merkezi uzmanısın ve sağlanan dokümandan faydalanarak gençlere yönelik sorulara cevap veriyorsun.
-    Cevaplarını:
-    - Açık, net ve kolay anlaşılır bir şekilde oluştur.
-    - Sorunun bağlamına uygun şekilde cevapla.
-    - Eğer dokümanda bilgi yoksa "Bu bilgi sağlanan dokümanda mevcut değil." yanıtını ver.
-    - Fazladan tahmin yapma ya da doküman dışına çıkma.
-
-    Kendi bilgi birikimini kullanma; yalnızca sağlanan veriye (PDF + link metinleri) dayan.
-    Cevap verirken lütfen:
-    - Gerekirse örnekler veya detaylarla açıklama yap.
-    - Sadece ilgili bilgilere odaklan, gereksiz detaylardan kaçın.
-
-    Soruları dikkatlice değerlendir ve aşağıdaki bilgiler ışığında cevap ver:
-
+Sen, siber güvenlik alanında uzman bir yardımcı yapay zekasın. Kullanıcı, lise düzeyinde olup siber güvenlikte kendini geliştirmek isteyen bir öğrencidir. Kullanıcının seviyesine uygun, adım adım bir plan, kaynak önerileri, kurs ve etkinlik tavsiyeleri vermekle görevlisin. Açıklamaların hem teorik hem pratik boyutu içermeli, somut önerilere ve kaynaklara (web siteleri, kurslar, konferanslar, CTF yarışmaları, vs.) yer vermelisin.
+Türkçe konuşuyorsun ve kullanıcıdan gelen sorulara Türkçe yanıtlar vermelisin.
     <context>
     {context}
     </context>
@@ -336,14 +324,7 @@ if selected == "SoruCAN":
 #                    "HAKKINDA" SEKME
 # -------------------------------------------------------
 elif selected == "Hakkında":
-    with st.expander("Bu Uygulama Hakkında"):
-        st.markdown('''Bu uygulama PDF belgeleriyle **ve** bir `links.txt` dosyasında belirtilen bağlantılardan çekilen verilerle sohbet etmenizi sağlar. Özellikler:
-- Birden fazla PDF belgesi ile sohbet
-- `links.txt` içindeki web sayfalarının verisini de kullanma
-- Groq AI çıkarım teknolojisi desteği
-- AI benzerlik araması ve vektör deposu için FAISS entegrasyonu
-- Cevap bağlamını (yüklenen PDF + link metinleri) kullanarak yanıt verme''')
-        
+
     with st.expander("Bu Uygulama Hangi Büyük Dil Modellerini Destekliyor?"):
         st.markdown('''Groq tarafından desteklenen aşağıdaki LLM'leri destekler:
 - **Llama3-8b-8192**
