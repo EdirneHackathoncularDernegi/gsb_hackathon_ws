@@ -1,4 +1,4 @@
-# GsB HekAtLon
+# GsB Hackathon 
 
 conda create -v --prefix C:\Users\fuchs\Desktop\gsb_hackathon_ws\env python=3.9 django
 
