@@ -75,24 +75,6 @@ prompt = ChatPromptTemplate.from_template(
     """
 )
 
-def extract_text_from_pdf(pdf_path):
-    """
-    PDF dosyasından metin çıkarır.
-    """
-    try:
-        doc = fitz.open(pdf_path)
-        text = ""
-        for page in doc:
-            text += page.get_text()
-        doc.close()
-
-        if not text.strip():
-            raise ValueError("PDF'den metin çıkarılamadı.")
-        return text
-    except Exception as e:
-        st.error(f"PDF işlenirken hata oluştu: {e}")
-        return ""
-
 def web_verisi_cek(url):
     """
     Verilen URL'den metin verilerini çeker.
@@ -130,18 +112,8 @@ if selected == "SoruCAN":
             st.warning("Klasörde analiz edilecek PDF bulunamadı.")
         else:
             with st.spinner("PDF dosyaları işleniyor..."):
-                pdf_metni = ''.join([extract_text_from_pdf(pdf) for pdf in pdf_files])
-                # PDF metninin yalnızca ilk 500 karakterini konsola yazdır
-                print("PDF başarıyla işlendi!")
-                # PDF metni konsola yazdırılmıyor.
-
-                # PDF metnini log dosyasına kaydet
-                #with open("pdf_text_log.txt", "w", encoding="utf-8") as log_file:
-                    #log_file.write(pdf_metni)
-                #print("PDF metni 'pdf_text_log.txt' dosyasına kaydedildi.")
+                pdf_metni = " ".join([extract_text_from_pdf(pdf) for pdf in pdf_files])
                 st.success("Tüm PDF dosyaları başarıyla işlendi!")
-                # PDF içeriğini ekrana yazdırmayı kaldırmak için aşağıdaki satırı yoruma alın veya silin.
-                # # st.write(pdf_metni)  # PDF içeriğini ekrana yazdırmayı kaldırdık.
 
     # PDF ve web metinlerini birleştirerek vektör oluşturma
     if pdf_metni or web_metni:
@@ -166,11 +138,8 @@ if selected == "SoruCAN":
 
         with st.spinner('İşleniyor...'):
             st.session_state.response = llm_cevabi_getir(llm, prompt, question)
-            if st.session_state.response and 'answer' in st.session_state.response:
-                st.session_state.messages.append({"role": "assistant", "content": st.session_state.response['answer']})
-                st.chat_message("assistant").write(st.session_state.response['answer'])
-            else:
-                st.error("Geçerli bir yanıt alınamadı.")
+            st.session_state.messages.append({"role": "assistant", "content": st.session_state.response['answer']})
+            st.chat_message("assistant").write(st.session_state.response['answer'])
 
 if selected == "Hakkında":
     with st.expander("Bu Uygulama Hakkında"):

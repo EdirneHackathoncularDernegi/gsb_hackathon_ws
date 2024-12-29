@@ -1,27 +1,52 @@
 import os
 import pickle
 import streamlit as st
-from util import *  # Yardımcı fonksiyonlar için util.py
+from util import *
 from streamlit_option_menu import option_menu
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
-
-# PyMuPDF for reliable PDF text extraction
-import fitz  
+import fitz  # PyMuPDF for reliable PDF text extraction
 
 # Kalıcı dosya yolları
 VECTOR_STORE_PATH = "vector_store.pkl"
-PDF_STORAGE_DIR = "uploaded_pdfs"
+
+# PDF metin çıkarma fonksiyonu
+def extract_text_from_pdf(pdf_path):
+    try:
+        doc = fitz.open(pdf_path)
+        text = ""
+        for page in doc:
+            text += page.get_text()
+        doc.close()
+
+        if not text.strip():
+            raise ValueError("PDF'den metin çıkarılamadı.")
+
+        return text
+    except Exception as e:
+        print(f"PDF işleme sırasında bir hata oluştu: {e}")
+        return ""
+
+# PDF ve vektör deposunu yükle
+def load_previous_data():
+    if os.path.exists(VECTOR_STORE_PATH):
+        with open(VECTOR_STORE_PATH, "rb") as f:
+            return pickle.load(f)
+    return None
+
+def save_vectorstore(vectorstore):
+    with open(VECTOR_STORE_PATH, "wb") as f:
+        pickle.dump(vectorstore, f)
 
 st.set_page_config(page_title="SoruCAN", page_icon=":robot_face:", layout="centered")
 
 if "vector_store" not in st.session_state:
-    st.session_state.vector_store = None
+    st.session_state.vector_store = load_previous_data()
 if "response" not in st.session_state:
     st.session_state.response = None
 if "prompt_activation" not in st.session_state:
-    st.session_state.prompt_activation = False
+    st.session_state.prompt_activation = bool(st.session_state.vector_store)
 if "conversation" not in st.session_state:
     st.session_state.conversation = None
 if "chat_history" not in st.session_state:
@@ -32,8 +57,8 @@ if "prompt" not in st.session_state:
 load_dotenv()
 
 st.sidebar.header('Yapılandırma')
-groq_api_key = yan_menu_api_anahtari_konfigurasyonu()
-model = yan_menu_model_secimi()
+groq_api_key = sidebar_api_key_configuration()
+model = sidebar_groq_model_selection()
 
 st.title("SoruCAN :robot_face:")
 st.write("*Sorularına Cevap, Hedeflerine Destek*")
@@ -85,7 +110,8 @@ if selected == "SoruCAN":
             st.warning("Klasörde analiz edilecek PDF bulunamadı.")
         else:
             with st.spinner("PDF dosyaları işleniyor..."):
-                st.session_state.vector_store = vektor_deposu_olustur(pdf_files)
+                st.session_state.vector_store = create_vectorstore(pdf_files)
+                save_vectorstore(st.session_state.vector_store)
                 st.session_state.prompt = True
                 st.success('Tüm PDF dosyaları başarıyla işlendi ve veri tabanı hazır!')
 
@@ -104,7 +130,7 @@ if selected == "SoruCAN":
         st.chat_message("user").write(question)
 
         with st.spinner('İşleniyor...'):
-            st.session_state.response = llm_cevabi_getir(llm, prompt, question)
+            st.session_state.response = get_llm_response(llm, prompt, question)
             st.session_state.messages.append({"role": "assistant", "content": st.session_state.response['answer']})
             st.chat_message("assistant").write(st.session_state.response['answer'])
 
