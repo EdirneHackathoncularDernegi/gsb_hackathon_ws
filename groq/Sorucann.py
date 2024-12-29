@@ -125,3 +125,19 @@ if selected == "Hakkında":
 
     with st.expander("Bu Uygulama Hangi Kütüphaneyi Vektör Deposu için Kullanıyor?"):
         st.markdown('''Bu uygulama AI benzerlik araması ve vektör deposu için FAISS'i destekler:''')
+
+    with st.expander("SoruCAN Nedir ve Ne İşe Yarar?"):
+        st.markdown('''SoruCAN, HedefGenç platformunun yapay zeka destekli asistanıdır. Gençlerin kariyer planlaması, iş ve staj fırsatları, eğitim önerileri gibi konularda sorularını yanıtlar ve rehberlik sağlar. Kişisel hedeflerinize ulaşmanız için size özel öneriler sunar.''')
+
+    with st.expander("SoruCAN’a Hangi Tür Soruları Sorabilirim?"):
+        st.markdown('''SoruCAN’a kariyer ve kişisel gelişimle ilgili birçok soru sorabilirsiniz. Örnek sorular:
+    - “Hangi mesleğe daha yatkınım?”
+    - “CV’mi nasıl geliştirebilirim?”
+    - “Yakınımda hangi kariyer etkinlikleri var?”
+    - “Bir staj bulmak için ne yapmalıyım?”''')
+
+    with st.expander("SoruCAN Nasıl Doğru Öneriler Sunuyor?"):
+        st.markdown('''SoruCAN, sizin profil bilgilerinizi (ilgi alanlarınız, kariyer hedefleriniz) ve sistemdeki fırsatları analiz ederek önerilerde bulunur. Ayrıca, yapay zeka desteği sayesinde sorularınıza hızlı ve güvenilir yanıtlar verir.''')
+
+    with st.expander("SoruCAN’a Verdiğim Bilgiler Güvenli mi?"):
+        st.markdown('''Evet, SoruCAN’a sağladığınız bilgiler tamamen güvendedir. Kişisel bilgileriniz yalnızca platform içindeki öneriler ve rehberlik için kullanılır. HedefGenç, veri güvenliğiniz için tüm yasal düzenlemelere uyar.''')
