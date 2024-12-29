@@ -14,7 +14,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
 from langchain_community.vectorstores import FAISS
 
-# EKLENDİ: PDF Desteği (artık doğrudan kod içinde path belirtilecek)
+# EKLENDİ: PDF Desteği
 from langchain.document_loaders import PyPDFLoader
 
 # Streamlit sayfa ayarları
@@ -25,152 +25,40 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Örnek CSS
-st.markdown(
-    """
-    <style>
-    [data-testid="stSidebar"] {
-        background-color: #e7e9ec; /* Sidebar'ın arka planı */
-        color: #333 !important;    /* Metin rengi */
-    }
-    .stTextInput > label {
-        font-weight: 600;
-    }
-    .stTitle, .stHeader, .stCaption {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # .env dosyasından yükleyelim
 load_dotenv()
 groq_api_key = os.environ.get('GROQ_API_KEY', None)
 
-# Web siteleri listesi
-websites = [
-    "https://gsb.gov.tr/haberler-ve-duyurular.html",
-    "https://genclikhizmetleri.gov.tr/hizmetlerimiz/",
-    #"https://biz.gsb.gov.tr/page/egitim/BilisimEgitimleri/"
-]
-
-# PDF dosyalarını koddan belirliyoruz (örnek yollar):
-pdf_file_paths = [
-    r"source\2023 Faaliyet Raporu.pdf",
-    r"source\2023 Faaliyet Raporu.pdf",
-]
-
-# Vektörleri kaydetmek için klasör
-vector_output_folder = r"source\vector_outputs"
-os.makedirs(vector_output_folder, exist_ok=True)
-
-st.title("SoruCan")
+# PKL dosyasını yükleme işlevi
+def load_vectors_from_pkl(pkl_file_path):
+    """PKL dosyasından vektörleri yükler."""
+    with open(pkl_file_path, 'rb') as f:
+        return pickle.load(f)
 
 # --- SIDEBAR ---
 with st.sidebar:
     st.header("Hakkında")
     st.write("""
     **SoruCan**, Gençlik ve Spor Bakanlığı ile ilgili web sitelerinden ve 
-    önceden belirlenmiş PDF'lerden toplanan bilgilere dayanarak sorularınızı 
+    önceden belirlenmiş verilerden toplanan bilgilere dayanarak sorularınızı 
     yanıtlamak için tasarlanmış bir chatbot prototipidir.
     """)
     st.markdown("---")
     st.write("*Matiricie*")
 
-# --- ANA GÖVDE ---
+# PKL dosyası yüklenecek
+pkl_file_path = st.text_input("PKL dosya yolunu girin", "source/vector_outputs/performans programı.pkl")
 
-def save_vectors_to_file(vectors, output_file):
-    """Vektörleri bir dosyaya kaydeder."""
-    with open(output_file, 'wb') as f:
-        pickle.dump(vectors, f)
-
-def load_vectors_from_file(file_path):
-    """Bir dosyadan vektörleri yükler."""
-    with open(file_path, 'rb') as f:
-        return pickle.load(f)
-
-# Yalnızca bir kez embeddings ve vectorstore oluşturmak
-if "vectors" not in st.session_state:
-    st.info("Vektör depoları oluşturuluyor, lütfen bekleyin...")
-    all_vectors = []
-    embeddings = OllamaEmbeddings()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-
-    # 1) Önce web sitelerinden veri çekelim
-    total_sites = len(websites)
-    progress_bar = st.progress(0)
-
-    for idx, url in enumerate(websites):
-        try:
-            with st.spinner(f"'{url}' adresinden veri toplanıyor..."):
-                loader = WebBaseLoader(url)
-                documents = loader.load()
-
-            if not documents:
-                st.warning(f"**{url}** adresinden veri alınamadı veya boş döndü.")
-                continue
-
-            final_docs = text_splitter.split_documents(documents)
-            if not final_docs:
-                st.warning(f"**{url}** dokümanlarını bölerken içerik oluşturulamadı.")
-                continue
-
-            vectors = FAISS.from_documents(final_docs, embeddings)
-            all_vectors.append(vectors)
-            st.success(f"**{url}** için vektörleşme tamamlandı! Doküman sayısı: {len(final_docs)}")
-
-        except Exception as e:
-            st.error(f"{url} verisi alınırken hata oluştu: {e}")
-
-        # Progress bar güncelle
-        progress_bar.progress(int((idx + 1) / total_sites * 100))
-
-    # 2) Şimdi PDF dosyalarını yükleyip vektörleştirelim
-    for pdf_path in pdf_file_paths:
-        try:
-            with st.spinner(f"'{pdf_path}' PDF dosyası yükleniyor..."):
-                pdf_loader = PyPDFLoader(pdf_path)
-                pdf_docs = pdf_loader.load()
-
-            if not pdf_docs:
-                st.warning(f"**{pdf_path}** içi boş ya da okunamadı.")
-                continue
-
-            pdf_final_docs = text_splitter.split_documents(pdf_docs)
-            if not pdf_final_docs:
-                st.warning(f"**{pdf_path}** belgelerini bölerken içerik oluşturulamadı.")
-                continue
-
-            pdf_vectors = FAISS.from_documents(pdf_final_docs, embeddings)
-
-            # Vektörleri kaydet
-            vector_file = os.path.join(vector_output_folder, os.path.basename(pdf_path).replace('.pdf', '_vectors.pkl'))
-            save_vectors_to_file(pdf_vectors, vector_file)
-
-            all_vectors.append(pdf_vectors)
-            st.success(f"**{pdf_path}** için vektörleşme tamamlandı ve kaydedildi! Doküman sayısı: {len(pdf_final_docs)}")
-
-        except Exception as e:
-            st.error(f"{pdf_path} yüklenirken hata oluştu: {e}")
-
-    # Tüm data (web + pdf) tek bir FAISS objesinde birleştirelim
-    if all_vectors:
-        base_vectorstore = all_vectors[0]
-        for vectorstore in all_vectors[1:]:
-            base_vectorstore.merge_from(vectorstore)
-        st.session_state.vectors = base_vectorstore
-
-        st.balloons()
-        st.success("Tüm kaynaklardan veri vektörleştirme tamamlandı!")
-    else:
-        st.error("Hiçbir veri kaynağından vektör oluşturulamadı. Uygulama çalışmayabilir.")
+if os.path.exists(pkl_file_path):
+    try:
+        # PKL dosyasını yükle
+        vectors = load_vectors_from_pkl(pkl_file_path)
+        st.session_state.vectors = vectors
+        st.success(f"PKL dosyası başarıyla yüklendi: {pkl_file_path}")
+    except Exception as e:
+        st.error(f"PKL dosyasını yüklerken hata oluştu: {e}")
 else:
-    st.info("Önceden oluşturulmuş vektör depoları kullanılıyor...")
-
-# GROQ_API_KEY yoksa uyarı
-if not groq_api_key:
-    st.error("GROQ_API_KEY bulunamadı! Lütfen .env dosyanızı veya çevresel değişkenlerinizi kontrol edin.")
+    st.warning("Belirtilen PKL dosya yolu bulunamadı. Lütfen doğru bir yol girin.")
 
 # LLM tanımı
 llm = ChatGroq(
