@@ -1,0 +1,35 @@
+{
+  "files": {
+    "main.css": "/static/css/main.5e691356.css",
+    "main.js": "/static/js/main.ff03ef90.js",
+    "static/js/488.cb923032.chunk.js": "/static/js/488.cb923032.chunk.js",
+    "static/media/reactjsilewebgelistirme.jpg": "/static/media/reactjsilewebgelistirme.ce4dfe9cdba2bc176cf2.jpg",
+    "static/media/htmlvecss.jpg": "/static/media/htmlvecss.e368b1860156832309c2.jpg",
+    "static/media/kisiselverimlilik.jpg": "/static/media/kisiselverimlilik.abcdce49f0ad6732d01a.jpg",
+    "static/media/javascriptemelleri.jpg": "/static/media/javascriptemelleri.dbd2e9c3abd62ced4a16.jpg",
+    "static/media/siberguvenliktemelleri.jpg": "/static/media/siberguvenliktemelleri.bd55d45e8d4a3e90a29f.jpg",
+    "static/media/takimyonetimi.jpg": "/static/media/takimyonetimi.e56fcb4a2bdf8f1aad1b.jpg",
+    "static/media/zamanyonetimi.jpg": "/static/media/zamanyonetimi.1932abc0cdd2944ed24d.jpg",
+    "static/media/etikhacking.jpg": "/static/media/etikhacking.f84fb799889d9a037ec9.jpg",
+    "static/media/agguvenligi.jpg": "/static/media/agguvenligi.236e0c988451aa76f94b.jpg",
+    "static/media/news5.jpg": "/static/media/news5.9f24229cdedd955d3432.jpg",
+    "static/media/news2.jpg": "/static/media/news2.b75483f39a2d356306cc.jpg",
+    "static/media/news4.jpg": "/static/media/news4.9898a2459bd92f63e5d9.jpg",
+    "static/media/news7.jpg": "/static/media/news7.01cc7834c93a5b120781.jpg",
+    "static/media/news6.jpg": "/static/media/news6.f754575f783ccee710c4.jpg",
+    "static/media/news3.jpg": "/static/media/news3.1d0cb8071b0553180ca0.jpg",
+    "static/media/badge2.PNG": "/static/media/badge2.46499765632f9496ea92.PNG",
+    "static/media/logo.PNG": "/static/media/logo.af4fc280e86a1129a6f0.PNG",
+    "static/media/badge3.PNG": "/static/media/badge3.88b0883185b57b0119b7.PNG",
+    "static/media/badge1.PNG": "/static/media/badge1.8a904d55930411e14d7f.PNG",
+    "static/media/edevlet-logo.png": "/static/media/edevlet-logo.a96f6814db1a3664920a.png",
+    "index.html": "/index.html",
+    "main.5e691356.css.map": "/static/css/main.5e691356.css.map",
+    "main.ff03ef90.js.map": "/static/js/main.ff03ef90.js.map",
+    "488.cb923032.chunk.js.map": "/static/js/488.cb923032.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5e691356.css",
+    "static/js/main.ff03ef90.js"
+  ]
+}

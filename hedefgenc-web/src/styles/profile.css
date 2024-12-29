@@ -1,0 +1,300 @@
+.profile-page {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-picture-container {
+  position: relative;
+}
+
+.profile-picture {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.change-photo-button {
+  margin-top: 10px;
+  padding: 10px 15px;
+  background-color: #061141;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.change-photo-button:hover {
+  background-color: #0056b3;
+}
+
+.profile-info {
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.goals .goal-bar {
+  margin-top: 20px;
+  position: relative;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 30px;
+  background-color: #f3f3f3;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 5px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress {
+  height: 100%;
+  background-color: #061141;
+  text-align: center;
+  color: white;
+  line-height: 30px; /* Bar yüksekliğine eşit */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 0;
+}
+
+.badges-container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.badge {
+  text-align: center;
+  flex: 1;
+}
+
+.badge-image img {
+  width: 160px;
+  height: 120px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.events-tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 15px;
+}
+
+.events-tabs button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.events-tabs button.active {
+  font-weight: bold;
+  border-bottom: 2px solid #007bff;
+  background-color: #eaf4ff;
+}
+
+.events-tabs button:hover {
+  background-color: #e0e0e0;
+}
+
+.events-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.event-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.event-item:hover {
+  background-color: #f1f1f1;
+}
+
+.view-certificate {
+  padding: 5px 10px;
+  background-color: #ff7c02;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-certificate:hover {
+  background-color: #f17a0b;
+}
+
+.save-button {
+  padding: 10px 20px;
+  background-color: #061141;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.save-button:hover {
+  background-color: #f17a0b;
+}
+
+.certificates {
+  margin-top: 20px;
+}
+.add-certificate-button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: white;
+  background-color: #ff7c02;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-certificate-button:hover {
+  background-color: #f17a0b;
+}
+
+/* Sertifika ekleme formu */
+.add-certificate-form {
+  margin: 5px 0;
+  padding: 25px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.add-certificate-form input {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.add-certificate-form button {
+  display: inline-block;
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.add-certificate-form button:hover {
+  background-color: #0056b3;
+}
+
+/* Sertifikalar kaydırma alanı */
+.certificate-slider-container {
+  display: flex;
+  align-items: center;
+}
+
+.certificate-slider {
+  overflow-x: auto;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.certificate-container {
+  display: flex;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.certificate {
+  flex: 0 0 auto;
+  width: 200px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  text-align: center;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.certificate:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.points-section {
+  margin-top: 20px;
+  text-align: center;
+  padding: 10px;
+  background-color: #eaf4ff;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.points-text {
+  font-size: 16px;
+  color: #061141;
+  line-height: 1.5;
+}
+
+.points-text strong {
+  font-size: 18px;
+  color: #ff7c02;
+}
+
+.points-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.points-link:hover {
+  text-decoration: underline;
+  color: #0056b3;
+}
