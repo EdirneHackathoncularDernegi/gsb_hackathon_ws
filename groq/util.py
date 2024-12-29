@@ -90,7 +90,7 @@ def llm_cevabi_getir(llm, prompt, soru: str) -> dict:
     try:
         belge_zinciri = create_stuff_documents_chain(llm, prompt)
         sorgu_zinciri = create_retrieval_chain(
-            st.session_state.vektor_deposu.as_retriever(),
+            st.session_state.vector_store.as_retriever(),
             belge_zinciri
         )
         cevap = sorgu_zinciri.invoke({'input': soru})
