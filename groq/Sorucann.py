@@ -370,3 +370,4 @@ elif selected == "Hakkında":
     with st.expander("SoruCAN’a Verdiğim Bilgiler Güvenli mi?"):
         st.markdown('''Evet, SoruCAN’a sağladığınız bilgiler tamamen güvendedir. Kişisel bilgileriniz yalnızca platform içindeki öneriler ve rehberlik için kullanılır. HedefGenç, veri güvenliğiniz için tüm yasal düzenlemelere uyar.''')
 
+
